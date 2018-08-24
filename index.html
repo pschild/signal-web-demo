@@ -12,29 +12,53 @@
 <body>
 
     <section id="registration-section">
-        <form id="reg-form" class="form-signin">
-            <h3 class="mb-3 font-weight-normal">Registrierung</h3>
-            <input type="text" id="reg-username" name="reg-username" class="form-control" placeholder="Benutzername" required autofocus>
-            <input type="password" id="reg-password" class="form-control" placeholder="Passwort" required>
-            <button type="submit" class="btn btn-lg btn-primary btn-block">Registrieren</button>
-        </form>
+        <div class="content">
+            <form id="reg-form" class="form-signin">
+                <h3 class="mb-3 font-weight-normal">Registrierung</h3>
+                <input type="text" id="reg-username" name="reg-username" class="form-control" placeholder="Benutzername" required autofocus>
+                <input type="password" id="reg-password" class="form-control" placeholder="Passwort" required>
+                <button type="submit" class="btn btn-lg btn-primary btn-block">Registrieren</button>
+            </form>
+        </div>
     </section>
 
     <section id="contacts-section">
-        <h1>Meine Kontakte</h1>
+        <div class="content">
+            <h3 class="mb-3 font-weight-normal">Kontakte</h3>
+            <button class="btn btn-outline-primary" type="button" id="refresh-contact-list-btn">aktualisieren</button>
+            <div id="contact-list" class="list-group">
+                <!--<a href="#" class="list-group-item list-group-item-action">Dapibus ac facilisis in</a>-->
+                <!--<a href="#" class="list-group-item list-group-item-action">Morbi leo risus</a>-->
+                <!--<a href="#" class="list-group-item list-group-item-action">Porta ac consectetur ac</a>-->
+                <!--<a href="#" class="list-group-item list-group-item-action disabled">Vestibulum at eros</a>-->
+            </div>
+        </div>
     </section>
 
     <section id="chat-section">
-        <h1>Chat</h1>
+        <div class="content">
+            <h3 id="recipient-name" class="mb-3 font-weight-normal">Chat</h3>
+            <button class="btn btn-outline-primary" type="button" id="refresh-messages-btn">aktualisieren</button>
+            <div id="chat-history"></div>
+            <div class="input-group mb-3" id="chat-input">
+                <input type="text" class="form-control" placeholder="Nachricht">
+                <div class="input-group-append">
+                    <button class="btn btn-primary" type="button">Senden</button>
+                </div>
+            </div>
+        </div>
     </section>
 
     <!--<script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>-->
+
+    <script src="node_modules/axios/dist/axios.min.js"></script>
 
     <script src="lib/libsignal-protocol.js"></script>
     <script src="scripts/signal/signalUtil.js"></script>
     <script src="scripts/signal/SignalWrapper.js"></script>
     <script src="scripts/signal/store/BrowserSignalProtocolStore.js"></script>
 
+    <script src="scripts/Api.js"></script>
     <script src="scripts/ActionAdapter.js"></script>
     <script src="scripts/App.js"></script>
     <script>

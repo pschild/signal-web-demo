@@ -61,6 +61,65 @@ class SignalWrapper {
         });
     }
 
+    createSession(user) {
+        let builder = new libsignal.SessionBuilder(this.store, this._getUserAddress(user.name));
+
+        let keyBundle = {
+            identityKey: signalUtil.base64ToArrayBuffer(user.identityKey), // public!
+            registrationId: user.registrationId,
+            signedPreKey: {
+                keyId: user.signedPreKeyId,
+                publicKey: signalUtil.base64ToArrayBuffer(user.pubSignedPreKey), // public!
+                signature: signalUtil.base64ToArrayBuffer(user.signature)
+            }
+        };
+
+        if (user.preKey) {  // optional!
+            keyBundle.preKey = {
+                keyId: user.preKey.keyId,
+                publicKey: signalUtil.base64ToArrayBuffer(user.preKey.pubPreKey)
+            }
+        }
+
+        return builder.processPreKey(keyBundle);
+    }
+
+    encrypt(message, recipient) {
+        let sessionCipher = new libsignal.SessionCipher(this.store, this._getUserAddress(recipient.name));
+        let messageAsArrayBuffer = signalUtil.toArrayBuffer(message);
+        return sessionCipher.encrypt(messageAsArrayBuffer);
+    }
+
+    decrypt(message, sender) {
+        // Base64 -> ArrayBuffer -> String
+        let ciphertext = signalUtil.base64ToArrayBuffer(message.body);
+        let messageType = message.type;
+
+        let sessionCipher = new libsignal.SessionCipher(this.store, this._getUserAddress(sender.name));
+
+        let decryptPromise;
+        if (messageType === 3) { // 3 = PREKEY_BUNDLE
+            console.log('decryptPreKeyWhisperMessage');
+            // Decrypt a PreKeyWhisperMessage by first establishing a new session
+            // The session will be set up automatically by libsignal.
+            // The information to do that is delivered within the message's ciphertext.
+            decryptPromise = sessionCipher.decryptPreKeyWhisperMessage(ciphertext, 'binary');
+        } else {
+            console.log('decryptWhisperMessage');
+            // Decrypt a normal message using an existing session
+            decryptPromise = sessionCipher.decryptWhisperMessage(ciphertext, 'binary');
+        }
+
+        return decryptPromise
+            .then(decryptedText => {
+                return signalUtil.toString(decryptedText);
+            });
+    }
+
+    _getUserAddress(username) {
+        return new libsignal.SignalProtocolAddress(username, 0); // deviceId is always 0
+    }
+
     preKeyBundleToBase64(bundle) {
         bundle.identityKey = signalUtil.arrayBufferToBase64(bundle.identityKey);
         bundle.preKeys.forEach(preKey => {
