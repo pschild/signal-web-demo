@@ -2,9 +2,44 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="styles/styles.css">
+
     <title>signal-web-demo</title>
 </head>
 <body>
+
+    <section id="registration-section">
+        <form id="reg-form" class="form-signin">
+            <h3 class="mb-3 font-weight-normal">Registrierung</h3>
+            <input type="text" id="reg-username" name="reg-username" class="form-control" placeholder="Benutzername" required autofocus>
+            <input type="password" id="reg-password" class="form-control" placeholder="Passwort" required>
+            <button type="submit" class="btn btn-lg btn-primary btn-block">Registrieren</button>
+        </form>
+    </section>
+
+    <section id="contacts-section">
+        <h1>Meine Kontakte</h1>
+    </section>
+
+    <section id="chat-section">
+        <h1>Chat</h1>
+    </section>
+
+    <!--<script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>-->
+
+    <script src="lib/libsignal-protocol.js"></script>
+    <script src="scripts/signal/signalUtil.js"></script>
+    <script src="scripts/signal/SignalWrapper.js"></script>
+    <script src="scripts/signal/store/BrowserSignalProtocolStore.js"></script>
+
+    <script src="scripts/ActionAdapter.js"></script>
+    <script src="scripts/App.js"></script>
+    <script>
+        new App();
+    </script>
 
 </body>
 </html>

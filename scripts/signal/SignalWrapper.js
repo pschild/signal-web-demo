@@ -1,0 +1,74 @@
+class SignalWrapper {
+
+    constructor() {
+        this.keyHelper = libsignal.KeyHelper;
+        this.store = new SignalProtocolStore();
+    }
+
+    generateIdentity() {
+        return Promise.all([
+            this.keyHelper.generateIdentityKeyPair(),
+            this.keyHelper.generateRegistrationId(),
+        ]).then(result => {
+            return Promise.all([
+                this.store.put('identityKey', result[0]),
+                this.store.put('registrationId', result[1])
+            ]);
+        });
+    }
+
+    generatePreKeyBundle(signedPreKeyId) {
+        return Promise.all([
+            this.store.getIdentityKeyPair(),
+            this.store.getLocalRegistrationId()
+        ]).then(result => {
+            let identity = result[0];
+            let registrationId = result[1];
+
+            const onetimePrekeyPromises = [];
+            // important to begin at 1 instead of 0, because of libsignal-protocol.js line 36119!
+            for (let keyId = 1; keyId < 6; keyId++) {
+                onetimePrekeyPromises.push(this.keyHelper.generatePreKey(keyId));
+            }
+
+            return Promise.all([
+                this.keyHelper.generateSignedPreKey(identity, signedPreKeyId),
+                ...onetimePrekeyPromises
+            ]).then(keys => {
+                let signedPreKey = keys[0];
+                this.store.storeSignedPreKey(signedPreKeyId, signedPreKey.keyPair);
+
+                let preKeys = keys.slice(1);
+                let preKeysPublicOnly = preKeys.map((preKey) => {
+                    return {
+                        keyId: preKey.keyId,
+                        publicKey: preKey.keyPair.pubKey
+                    }
+                });
+                preKeys.forEach(preKey => this.store.storePreKey(preKey.keyId, preKey.keyPair));
+
+                return {
+                    identityKey: identity.pubKey,
+                    registrationId: registrationId,
+                    preKeys: preKeysPublicOnly,
+                    signedPreKey: {
+                        keyId: signedPreKeyId,
+                        publicKey: signedPreKey.keyPair.pubKey,
+                        signature: signedPreKey.signature
+                    }
+                };
+            });
+        });
+    }
+
+    preKeyBundleToBase64(bundle) {
+        bundle.identityKey = signalUtil.arrayBufferToBase64(bundle.identityKey);
+        bundle.preKeys.forEach(preKey => {
+            preKey.publicKey = signalUtil.arrayBufferToBase64(preKey.publicKey);
+        });
+        bundle.signedPreKey.publicKey = signalUtil.arrayBufferToBase64(bundle.signedPreKey.publicKey);
+        bundle.signedPreKey.signature = signalUtil.arrayBufferToBase64(bundle.signedPreKey.signature);
+        return bundle;
+    }
+
+}
