@@ -15,7 +15,7 @@ class App {
         this.contactListView.setListItemClickCallback(user => {
             this._adapter.loadUserById(user.id)
                 .then(user => {
-                    this._setCurrentChatPartner(user);
+                    this.setCurrentChatPartner(user);
                     return this._adapter.createSession(user);
                 })
                 .then(() => {
@@ -27,19 +27,27 @@ class App {
         // registration view
         this.registrationView = new Registration();
         this.registrationView.setRegistrationCallback(user => {
-            this._setCurrentUser(user);
+            this.setCurrentUser(user);
             this.contactListView.updateContactList().then(() => this._showContacts());
         });
 
         this._showRegistration();
     }
 
-    _setCurrentUser(user) {
+    setCurrentUser(user) {
         this._currentUser = user;
     }
 
-    _setCurrentChatPartner(user) {
+    getCurrentUser() {
+        return this._currentUser;
+    }
+
+    setCurrentChatPartner(user) {
         this._currentChatPartner = user;
+    }
+
+    getCurrentChatPartner() {
+        return this._currentChatPartner;
     }
 
     _showRegistration() {

@@ -39,7 +39,7 @@ class ContactList {
             .then(userList => {
                 this.$contactList.innerHTML = '';
                 userList
-                    .filter(user => user.name !== this._app._currentUser.name) // TODO
+                    .filter(user => user.name !== this._app.getCurrentUser().name) // TODO
                     .forEach(user => {
                         let listItem = document.createElement('a');
                         listItem.href = '#';

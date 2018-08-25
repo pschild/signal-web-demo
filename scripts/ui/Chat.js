@@ -25,9 +25,9 @@ class Chat {
                 alert('Sie können keine leere Nachricht versenden.');
                 return;
             }
-            this._adapter.encrypt(message, this._app._currentChatPartner)
+            this._adapter.encrypt(message, this._app.getCurrentChatPartner())
                 .then((ciphertext) => {
-                    return this._adapter.sendMessage(this._app._currentUser, ciphertext);
+                    return this._adapter.sendMessage(this._app.getCurrentUser(), ciphertext);
                 })
                 .then(() => {
                     this._addMessageBubble({
@@ -51,9 +51,9 @@ class Chat {
     }
 
     _updateMessagesOfCurrentChatPartner() {
-        this._adapter.loadUnreadMessages(this._app._currentUser, this._app._currentChatPartner)
+        this._adapter.loadUnreadMessages(this._app.getCurrentUser(), this._app.getCurrentChatPartner())
             .then(messages => {
-                let promises = messages.map(message => this._adapter.decrypt(message, this._app._currentChatPartner));
+                let promises = messages.map(message => this._adapter.decrypt(message, this._app.getCurrentChatPartner()));
                 return Promise.all(promises);
             })
             .then(decryptedMessages => {
@@ -85,7 +85,7 @@ class Chat {
     }
 
     show() {
-        this.$recipientName.innerHTML = this._app._currentChatPartner.name;
+        this.$recipientName.innerHTML = this._app.getCurrentChatPartner().name;
         this.$chatHistoryContainer.innerHTML = '';
 
         this.$section.style.display = 'block';
