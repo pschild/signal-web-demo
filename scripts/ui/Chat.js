@@ -30,7 +30,10 @@ class Chat {
                     return this._adapter.sendMessage(this._app._currentUser, ciphertext);
                 })
                 .then(() => {
-                    this._addMessageBubble(message);
+                    this._addMessageBubble({
+                        body: message,
+                        timestamp: new Date()
+                    });
                 });
         });
 
@@ -60,20 +63,24 @@ class Chat {
             });
     }
 
-    _addMessageBubble(message, isRemoteMessage = false) {
+    _addMessageBubble(messageObject, isRemoteMessage = false) {
         let bubbleContainer = document.createElement('div');
         bubbleContainer.className = isRemoteMessage ? 'message-bubble float-left' : 'message-bubble float-right';
         let messageContainer = document.createElement('div');
         messageContainer.className = isRemoteMessage ? 'alert alert-light' : 'alert alert-primary';
-        let content = document.createTextNode(message);
 
-        let clearfix = document.createElement('div');
-        clearfix.className = 'clearfix';
+        let messageContent = document.createTextNode(messageObject.body);
 
-        messageContainer.appendChild(content);
+        let datetimeLabel = document.createElement('div');
+        datetimeLabel.className = 'datetime-label';
+        let dateTimeContent = document.createTextNode(new Date(messageObject.timestamp).toLocaleString());
+
+        datetimeLabel.appendChild(dateTimeContent);
+        messageContainer.appendChild(datetimeLabel);
+        messageContainer.appendChild(messageContent);
         bubbleContainer.appendChild(messageContainer);
-
         this.$chatHistoryContainer.appendChild(bubbleContainer);
+
         this.$chatHistoryContainer.scrollTop = this.$chatHistoryContainer.scrollHeight;
     }
 

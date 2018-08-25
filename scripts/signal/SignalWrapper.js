@@ -112,7 +112,8 @@ class SignalWrapper {
 
         return decryptPromise
             .then(decryptedText => {
-                return signalUtil.toString(decryptedText);
+                message.body = signalUtil.toString(decryptedText);
+                return message;
             });
     }
 

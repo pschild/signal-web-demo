@@ -1,5 +1,5 @@
 body {
-    background-color: #f5f5f5;
+    background-color: #e8e8e8;
     margin: 10px;
 }
 
@@ -43,8 +43,15 @@ body {
 #chat-history {
     height: 500px;
     overflow-y: auto;
+    overflow-x: hidden;
+    word-wrap: break-word;
 }
 
 .message-bubble {
     clear: both;
+    max-width: 80%;
+}
+
+.datetime-label {
+    font-size: small;
 }
