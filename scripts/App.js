@@ -11,12 +11,14 @@ class App {
 
         this.$contactList = this.$contactsSection.querySelector('#contact-list');
         this.$refreshContactListBtn = this.$contactsSection.querySelector('#refresh-contact-list-btn');
+        this.$backToRegistrationBtn = this.$contactsSection.querySelector('#back-to-registration-btn');
 
         this.$recipientName = this.$chatSection.querySelector('#recipient-name');
         this.$refreshMessagesBtn = this.$chatSection.querySelector('#refresh-messages-btn');
         this.$chatHistoryContainer = this.$chatSection.querySelector('#chat-history');
         this.$chatMessage = this.$chatSection.querySelector('#chat-input > input');
-        this.$sendMessageBtn = this.$chatSection.querySelector('#chat-input button');
+        this.$sendMessageBtn = this.$chatSection.querySelector('#send-message-btn');
+        this.$backToContactsBtn = this.$chatSection.querySelector('#back-to-contacts-btn');
 
         this._adapter = new ActionAdapter();
 
@@ -45,11 +47,15 @@ class App {
 
         this.$sendMessageBtn.addEventListener('click', () => {
             let message = this.$chatMessage.value;
+            if (!message || !message.length) {
+                alert('Sie können keine leere Nachricht versenden.');
+                return;
+            }
             this._adapter.encrypt(message, this._currentChatPartner)
                 .then((ciphertext) => {
                     return this._adapter.sendMessage(this._currentUser, ciphertext);
                 })
-                .then((s) => {
+                .then(() => {
                     this._addMessageBubble(message);
                 });
         });
@@ -60,6 +66,14 @@ class App {
 
         this.$refreshMessagesBtn.addEventListener('click', () => {
             this._updateMessagesOfCurrentChatPartner();
+        });
+
+        this.$backToContactsBtn.addEventListener('click', () => {
+            this._showContacts();
+        });
+
+        this.$backToRegistrationBtn.addEventListener('click', () => {
+            this._showRegistration();
         });
     }
 
@@ -108,6 +122,8 @@ class App {
                 return this._adapter.createSession(user);
             })
             .then(() => {
+                this.$recipientName.innerHTML = user.name;
+                this.$chatHistoryContainer.innerHTML = '';
                 this._showChat();
             });
     }

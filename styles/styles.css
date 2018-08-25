@@ -1,10 +1,12 @@
 body {
     background-color: #f5f5f5;
+    margin: 10px;
 }
 
 .content {
     max-width: 500px;
     margin: auto;
+    padding: 10px 0 10px 0;
 }
 
 .form-signin {
