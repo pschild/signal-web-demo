@@ -3,6 +3,10 @@ body {
     margin: 10px;
 }
 
+.display-4 {
+    font-size: 2rem;
+}
+
 .content {
     max-width: 500px;
     margin: auto;
