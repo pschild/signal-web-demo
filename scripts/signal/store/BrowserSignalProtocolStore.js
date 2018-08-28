@@ -1,3 +1,10 @@
+/**
+ * Store for persisting identities, keys and session information for a Signal user.
+ * The data will be stored in the browsers' LocalStorage.
+ *
+ * Based on https://raw.githubusercontent.com/signalapp/libsignal-protocol-javascript/master/test/InMemorySignalProtocolStore.js
+ */
+
 function SignalProtocolStore() {
     this.store = localStorage;
     this.store.clear();

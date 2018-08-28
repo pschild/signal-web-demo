@@ -1,3 +1,6 @@
+/**
+ * Class for serving an interface between UI and Signal specific functions.
+ */
 class ActionAdapter {
 
     constructor() {
@@ -40,7 +43,6 @@ class ActionAdapter {
     }
 
     sendMessage(sender, encryptedMessage) {
-        // String -> ArrayBuffer -> Base64
         encryptedMessage.body = signalUtil.toArrayBuffer(encryptedMessage.body);
         encryptedMessage.body = signalUtil.arrayBufferToBase64(encryptedMessage.body);
         return this.api.sendMessage(sender, encryptedMessage);

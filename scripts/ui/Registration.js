@@ -1,3 +1,6 @@
+/**
+ * Class defining the registration view.
+ */
 class Registration {
 
     constructor() {
@@ -6,7 +9,7 @@ class Registration {
         this.$registrationForm = this.$section.querySelector('#reg-form');
         this.$registrationUsername = this.$registrationForm.querySelector('#reg-username');
 
-        this._adapter = new ActionAdapter(); // TODO
+        this._adapter = new ActionAdapter();
 
         this._registrationCallback = undefined;
 

@@ -1,3 +1,6 @@
+/**
+ * Class defining the chat view.
+ */
 class Chat {
 
     constructor(app) {
@@ -10,8 +13,8 @@ class Chat {
         this.$sendMessageBtn = this.$section.querySelector('#send-message-btn');
         this.$backToContactsBtn = this.$section.querySelector('#back-to-contacts-btn');
 
-        this._adapter = new ActionAdapter(); // TODO
-        this._app = app; // TODO
+        this._adapter = new ActionAdapter();
+        this._app = app;
 
         this._backButtonClickCallback = undefined;
 
@@ -25,14 +28,17 @@ class Chat {
                 alert('Sie können keine leere Nachricht versenden.');
                 return;
             }
+            // encrypt message
             this._adapter.encrypt(message, this._app.getCurrentChatPartner())
                 .then((ciphertext) => {
+                    // send message to server
                     return this._adapter.sendMessage(this._app.getCurrentUser(), ciphertext);
                 })
                 .then(() => {
+                    // add sent message directly to UI
                     this._addMessageBubble({
                         body: message,
-                        timestamp: new Date()
+                        timestamp: new Date() // now
                     });
                 });
         });
@@ -53,11 +59,13 @@ class Chat {
     _updateMessagesOfCurrentChatPartner() {
         this._adapter.loadUnreadMessages(this._app.getCurrentUser(), this._app.getCurrentChatPartner())
             .then(messages => {
+                // decrypt all messages
                 let promises = messages.map(message => this._adapter.decrypt(message, this._app.getCurrentChatPartner()));
                 return Promise.all(promises);
             })
             .then(decryptedMessages => {
                 decryptedMessages.forEach(message => {
+                    // add each decrypted message to UI
                     this._addMessageBubble(message, true);
                 });
             });

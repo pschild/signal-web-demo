@@ -1,17 +1,21 @@
+/**
+ * Class for handling the app's state and views.
+ */
 class App {
 
     constructor() {
         this._adapter = new ActionAdapter();
 
+        // the app's state
         this._currentUser = null;
         this._currentChatPartner = null;
 
-        // chat view
-        this.chatView = new Chat(this); // TODO
+        // create chat view
+        this.chatView = new Chat(this);
         this.chatView.setBackButtonClickCallback(() => this._showContacts());
 
-        // contact list view
-        this.contactListView = new ContactList(this); // TODO
+        // create contact list view
+        this.contactListView = new ContactList(this);
         this.contactListView.setListItemClickCallback(user => {
             this._adapter.loadUserById(user.id)
                 .then(user => {
@@ -24,13 +28,14 @@ class App {
         });
         this.contactListView.setBackButtonClickCallback(() => this._showRegistration());
 
-        // registration view
+        // create registration view
         this.registrationView = new Registration();
         this.registrationView.setRegistrationCallback(user => {
             this.setCurrentUser(user);
             this.contactListView.updateContactList().then(() => this._showContacts());
         });
 
+        // registration is shown at first load
         this._showRegistration();
     }
 

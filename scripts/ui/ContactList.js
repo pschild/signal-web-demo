@@ -1,3 +1,6 @@
+/**
+ * Class defining the contact list view.
+ */
 class ContactList {
 
     constructor(app) {
@@ -7,8 +10,8 @@ class ContactList {
         this.$refreshContactListBtn = this.$section.querySelector('#refresh-contact-list-btn');
         this.$backToRegistrationBtn = this.$section.querySelector('#back-to-registration-btn');
 
-        this._adapter = new ActionAdapter(); // TODO
-        this._app = app; // TODO
+        this._adapter = new ActionAdapter();
+        this._app = app;
 
         this._listItemClickCallback = undefined;
         this._backButtonClickCallback = undefined;
@@ -39,7 +42,8 @@ class ContactList {
             .then(userList => {
                 this.$contactList.innerHTML = '';
                 userList
-                    .filter(user => user.name !== this._app.getCurrentUser().name) // TODO
+                    // filter current user, so that he's not shown in the contacts list
+                    .filter(user => user.name !== this._app.getCurrentUser().name)
                     .forEach(user => {
                         let listItem = document.createElement('a');
                         listItem.href = '#';
@@ -51,6 +55,7 @@ class ContactList {
                         let label = document.createTextNode(user.name);
                         listItem.appendChild(label);
 
+                        // click event for each list item
                         listItem.addEventListener('click', (event) => {
                             this._listItemClickCallback({
                                 id: event.target.dataset.id,

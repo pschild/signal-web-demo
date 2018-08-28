@@ -1,3 +1,6 @@
+/**
+ * Class that wraps signal specific methods.
+ */
 class SignalWrapper {
 
     constructor() {
@@ -27,7 +30,7 @@ class SignalWrapper {
 
             const onetimePrekeyPromises = [];
             // important to begin at 1 instead of 0, because of libsignal-protocol.js line 36119!
-            for (let keyId = 1; keyId < 6; keyId++) {
+            for (let keyId = 1; keyId < 6; keyId++) { // in this case, 5 prekeys will be generated.
                 onetimePrekeyPromises.push(this.keyHelper.generatePreKey(keyId));
             }
 
@@ -65,16 +68,16 @@ class SignalWrapper {
         let builder = new libsignal.SessionBuilder(this.store, this._getUserAddress(user.name));
 
         let keyBundle = {
-            identityKey: signalUtil.base64ToArrayBuffer(user.identityKey), // public!
+            identityKey: signalUtil.base64ToArrayBuffer(user.identityKey), // public key
             registrationId: user.registrationId,
             signedPreKey: {
                 keyId: user.signedPreKeyId,
-                publicKey: signalUtil.base64ToArrayBuffer(user.pubSignedPreKey), // public!
+                publicKey: signalUtil.base64ToArrayBuffer(user.pubSignedPreKey),
                 signature: signalUtil.base64ToArrayBuffer(user.signature)
             }
         };
 
-        if (user.preKey) {  // optional!
+        if (user.preKey) {  // prekeys are optional!
             keyBundle.preKey = {
                 keyId: user.preKey.keyId,
                 publicKey: signalUtil.base64ToArrayBuffer(user.preKey.pubPreKey)
@@ -91,7 +94,6 @@ class SignalWrapper {
     }
 
     decrypt(message, sender) {
-        // Base64 -> ArrayBuffer -> String
         let ciphertext = signalUtil.base64ToArrayBuffer(message.body);
         let messageType = message.type;
 
@@ -99,13 +101,11 @@ class SignalWrapper {
 
         let decryptPromise;
         if (messageType === 3) { // 3 = PREKEY_BUNDLE
-            console.log('decryptPreKeyWhisperMessage');
             // Decrypt a PreKeyWhisperMessage by first establishing a new session
             // The session will be set up automatically by libsignal.
             // The information to do that is delivered within the message's ciphertext.
             decryptPromise = sessionCipher.decryptPreKeyWhisperMessage(ciphertext, 'binary');
         } else {
-            console.log('decryptWhisperMessage');
             // Decrypt a normal message using an existing session
             decryptPromise = sessionCipher.decryptWhisperMessage(ciphertext, 'binary');
         }
@@ -118,7 +118,7 @@ class SignalWrapper {
     }
 
     _getUserAddress(username) {
-        return new libsignal.SignalProtocolAddress(username, 0); // deviceId is always 0
+        return new libsignal.SignalProtocolAddress(username, 0); // deviceId is always 0 for the demo
     }
 
     preKeyBundleToBase64(bundle) {

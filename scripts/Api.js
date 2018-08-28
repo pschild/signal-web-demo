@@ -1,3 +1,6 @@
+/**
+ * Class containing methods to communicate with the server via REST-API.
+ */
 class Api {
 
     constructor() {
