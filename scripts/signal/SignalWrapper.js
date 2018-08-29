@@ -1,3 +1,7 @@
+// STORE should actually be a static variable of class SignalWrapper. Since static class members are not possible with
+// ES6 yet, it is defined outside the class.
+var STORE = undefined;
+
 /**
  * Class that wraps signal specific methods.
  */
@@ -5,7 +9,9 @@ class SignalWrapper {
 
     constructor() {
         this.keyHelper = libsignal.KeyHelper;
-        this.store = new SignalProtocolStore();
+        if (!STORE) {
+            STORE = new SignalProtocolStore();
+        }
     }
 
     generateIdentity() {
@@ -14,16 +20,16 @@ class SignalWrapper {
             this.keyHelper.generateRegistrationId(),
         ]).then(result => {
             return Promise.all([
-                this.store.put('identityKey', result[0]),
-                this.store.put('registrationId', result[1])
+                STORE.put('identityKey', result[0]),
+                STORE.put('registrationId', result[1])
             ]);
         });
     }
 
     generatePreKeyBundle(signedPreKeyId) {
         return Promise.all([
-            this.store.getIdentityKeyPair(),
-            this.store.getLocalRegistrationId()
+            STORE.getIdentityKeyPair(),
+            STORE.getLocalRegistrationId()
         ]).then(result => {
             let identity = result[0];
             let registrationId = result[1];
@@ -39,7 +45,7 @@ class SignalWrapper {
                 ...onetimePrekeyPromises
             ]).then(keys => {
                 let signedPreKey = keys[0];
-                this.store.storeSignedPreKey(signedPreKeyId, signedPreKey.keyPair);
+                STORE.storeSignedPreKey(signedPreKeyId, signedPreKey.keyPair);
 
                 let preKeys = keys.slice(1);
                 let preKeysPublicOnly = preKeys.map((preKey) => {
@@ -48,7 +54,7 @@ class SignalWrapper {
                         publicKey: preKey.keyPair.pubKey
                     }
                 });
-                preKeys.forEach(preKey => this.store.storePreKey(preKey.keyId, preKey.keyPair));
+                preKeys.forEach(preKey => STORE.storePreKey(preKey.keyId, preKey.keyPair));
 
                 return {
                     identityKey: identity.pubKey,
@@ -65,7 +71,7 @@ class SignalWrapper {
     }
 
     createSession(user) {
-        let builder = new libsignal.SessionBuilder(this.store, this._getUserAddress(user.name));
+        let builder = new libsignal.SessionBuilder(STORE, this._getUserAddress(user.name));
 
         let keyBundle = {
             identityKey: signalUtil.base64ToArrayBuffer(user.identityKey), // public key
@@ -88,7 +94,7 @@ class SignalWrapper {
     }
 
     encrypt(message, recipient) {
-        let sessionCipher = new libsignal.SessionCipher(this.store, this._getUserAddress(recipient.name));
+        let sessionCipher = new libsignal.SessionCipher(STORE, this._getUserAddress(recipient.name));
         let messageAsArrayBuffer = signalUtil.toArrayBuffer(message);
         return sessionCipher.encrypt(messageAsArrayBuffer);
     }
@@ -97,7 +103,7 @@ class SignalWrapper {
         let ciphertext = signalUtil.base64ToArrayBuffer(message.body);
         let messageType = message.type;
 
-        let sessionCipher = new libsignal.SessionCipher(this.store, this._getUserAddress(sender.name));
+        let sessionCipher = new libsignal.SessionCipher(STORE, this._getUserAddress(sender.name));
 
         let decryptPromise;
         if (messageType === 3) { // 3 = PREKEY_BUNDLE
